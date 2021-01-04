@@ -79,22 +79,31 @@ function draw_clear(ctx, width, height, c)
 	ctx.fillStyle = c;
 	ctx.fillRect(0, 0, width, height);
 }
+draw_clear(ctx, cvs.width, cvs.height, "black");
+
+var xa = new Line(new Point(0, cvs.height/2), new Point(cvs.width, cvs.height/2), "green", ctx);
+
 
 cvs.addEventListener("mousemove", function(e)
 {
-	//dolight(e);
-});
 
-draw_clear(ctx, cvs.width, cvs.height, "black");
-
-var lines = [new Line(new Point(0, 0), new Point(300, 200), "yellow", ctx),
-		new Line(new Point(300, 500), new Point(800, 300), "blue", ctx)];
-var walls = [new Line(new Point(20, 500), new Point(950, 500), "blue", ctx)];
+var lines = [new Line(new Point(0, 0), new Point(300, 200), "yellow", ctx)];
+var walls = [new Line(new Point(20, 200), new Point(950, 500), "blue", ctx)];
 
 lines[0].draw();
 walls[0].draw();
+	//console.log("OGMOGM");
+	draw_clear(ctx, cvs.width, cvs.height, "black");
+	var area = cvs.getBoundingClientRect();
+	var x = Math.round((e.clientX - area.left))-1;
+	var y = Math.round((e.clientY - area.top))-1;
+	walls[0].p2.x = x;
+	walls[0].p2.y = y;
+	walls[0].calc();
+	walls[0].draw();
+	reflect(lines[0], walls);
+});
 
-reflect(lines[0], walls);
 
 function reflect(line, walls)
 {
@@ -106,13 +115,33 @@ function reflect(line, walls)
 		line.p2.x = cx;
 		line.p2.y = cy;
 		line.draw();
-		var deg = 2*Math.PI-(Math.atan((line.m-walls[i].m)/(1+(line.m*walls[i].m))));
-		var nx = cx + 1;
-		var m3 = ((2*line.m)+(walls[i].m * Math.pow(line.m, 2)) - walls[i].m) / (2*line.m*walls[i].m - Math.pow(line.m, 2) + 1);
-		var ny = -8*(cy+m3);
+
+		var ti = Math.atan(line.m);
+		var tn = Math.atan(-(1/walls[i].m));
+		var tb = (2*tn)-ti;
+		console.log(tb);
+
+
+		if (tb > 0 && tb < Math.PI/2)
+		{
+			console.log("111");
+			tb += Math.PI;
+		}
+		else if (tb > Math.PI/2 && tb < Math.PI)
+		{
+			console.log("222");
+			tb += Math.PI;
+		}
+
+		var nm = Math.tan(tb);
+
+		//if (Math.abs(tb) < Math.PI/2) nm = (-1/nm);
+		var nb = cy-(nm*cx);
+		var len = 1000;
+		var nx = cx + len;
+		var ny = cy + (len*nm);
 		var nline = new Line(new Point(cx, cy), new Point(nx, ny), "red", ctx);
 		nline.draw();
-		console.log(m3);
 	}
 }
 
