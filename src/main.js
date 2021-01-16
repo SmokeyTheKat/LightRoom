@@ -87,8 +87,10 @@ var xa = new Line(new Point(0, cvs.height/2), new Point(cvs.width, cvs.height/2)
 cvs.addEventListener("mousemove", function(e)
 {
 
-var lines = [new Line(new Point(0, 0), new Point(300, 200), "yellow", ctx)];
-var walls = [new Line(new Point(20, 200), new Point(950, 500), "blue", ctx)];
+//var lines = [new Line(new Point(500, 000), new Point(501, 100), "yellow", ctx)];
+//var walls = [new Line(new Point(0, 500), new Point(1000, 500), "blue", ctx)];
+var lines = [new Line(new Point(500, 600), new Point(501, 500), "yellow", ctx)];
+var walls = [new Line(new Point(0, 100), new Point(1000, 100), "blue", ctx)];
 
 lines[0].draw();
 walls[0].draw();
@@ -97,9 +99,10 @@ walls[0].draw();
 	var area = cvs.getBoundingClientRect();
 	var x = Math.round((e.clientX - area.left))-1;
 	var y = Math.round((e.clientY - area.top))-1;
-	walls[0].p2.x = x;
-	walls[0].p2.y = y;
-	walls[0].calc();
+	lines[0].p2.x = x;
+	lines[0].p2.y = y;
+	lines[0].calc();
+	lines[0].draw();
 	walls[0].draw();
 	reflect(lines[0], walls);
 });
@@ -119,27 +122,54 @@ function reflect(line, walls)
 		var ti = Math.atan(line.m);
 		var tn = Math.atan(-(1/walls[i].m));
 		var tb = (2*tn)-ti;
-		console.log(tb);
+		var otb = tb;
 
-
-		if (tb > 0 && tb < Math.PI/2)
-		{
-			console.log("111");
-			tb += Math.PI;
-		}
-		else if (tb > Math.PI/2 && tb < Math.PI)
-		{
-			console.log("222");
-			tb += Math.PI;
-		}
 
 		var nm = Math.tan(tb);
+		console.log(tb, nm);
 
 		//if (Math.abs(tb) < Math.PI/2) nm = (-1/nm);
 		var nb = cy-(nm*cx);
 		var len = 1000;
 		var nx = cx + len;
 		var ny = cy + (len*nm);
+		if (tb < 0) tb += Math.PI*2;
+		if (tb > 0 && tb < Math.PI/2)
+		{
+			console.log("111");
+			nx = cx;
+			ny = cy;
+			cx -= 1000;
+			cy -= 1000*nm;
+		}
+		else if (tb > Math.PI/2 && tb < Math.PI)
+		{
+			console.log("222");
+			nx = cx;
+			ny = cy;
+			cx -= 1000;
+			cy -= 1000*nm;
+		}
+		else if (tb > Math.PI && tb < 1.5*Math.PI)
+		{
+			console.log("333");
+			if (line.m < 0)
+			{
+				console.log("333");
+				nx = cx;
+				ny = cy;
+				cx -= 1000;
+				cy -= 1000*nm;
+			}
+		}
+		else if (tb > 1.5*Math.PI/2 && tb < 2*Math.PI)
+		{
+			console.log("444");
+			nx = cx;
+			ny = cy;
+			cx -= 1000;
+			cy -= 1000*nm;
+		}
 		var nline = new Line(new Point(cx, cy), new Point(nx, ny), "red", ctx);
 		nline.draw();
 	}
